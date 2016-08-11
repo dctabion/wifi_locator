@@ -22,10 +22,12 @@ module.exports.locationsReadOne = function(req, res) {
       // Location ID not found
       if(!location) {
         sendJsonResponse(res, 404, { messages: "locationid not found"});
+        return;
       }
       // DB error
       else if (err) {
         sendJsonResponse(res, 404, err);
+        return;
       }
       // Found location.  Return location info
       sendJsonResponse(res, 200, location);

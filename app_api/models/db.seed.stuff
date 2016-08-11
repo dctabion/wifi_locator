@@ -19,16 +19,19 @@
     closed: true
   }],
   reviews: [{
+    _id: ObjectId(),
     author: 'Simon Holmes',
     rating: 5,
     timestamp: '16 July 2013',
     reviewText: 'What a great place.  I can\'t say enough good things about it.'
   }, {
+    _id: ObjectId(),
     author: 'Dood McGee',
     rating: 5,
     timestamp: '17 July 2013',
     reviewText: 'A class a dump.  I cannot stand it.  loud. obnoxious.  But i\'ll give 5 stars.'
   }, {
+    _id: ObjectId(),
     author: 'Fred McGriff',
     rating: 5,
     timestamp: '1 July 2013',
@@ -65,11 +68,13 @@
     closed: true
   }],
   reviews: [{
+    _id: ObjectId(),
     author: 'Franz Jackson',
     rating: 1,
     timestamp: '16 July 2013',
     reviewText: 'What can I say?  The music stinks!'
   }, {
+    _id: ObjectId(),
     author: 'Louis Armstrong',
     rating: 1,
     timestamp: '17 July 2013',
@@ -97,11 +102,13 @@
     closed: true
   }],
   reviews: [{
+    _id: ObjectId(),
     author: 'Rosa Parks',
     rating: 1,
     timestamp: '16 July 2013',
     reviewText: 'Even the back of the bus had bad WIFI'
   }, {
+    _id: ObjectId(),
     author: 'Donald Trump',
     rating: 5,
     timestamp: '17 July 2013',
