@@ -182,7 +182,7 @@ module.exports.locationsDeleteOne = function(req, res) {
       .exec(
         function(err, location) {
           if (err) {
-            sendJsonresponse(res, 404, err);
+            sendJsonResponse(res, 404, err);
             return;
           }
           sendJsonResponse(res, 404, err);
@@ -190,7 +190,7 @@ module.exports.locationsDeleteOne = function(req, res) {
       );
   }
   else {
-    sendJsonResonse(res, 404, {
+    sendJsonResponse(res, 404, {
       "message": "No locationid"
     });
   }
