@@ -25,8 +25,12 @@ var theEarth = (function() {
 }) ();
 
 module.exports.locationsListByDistance = function(req, res) {
+  console.log("req.query: ", req.query);
+
   var lng = parseFloat(req.query.lng);
   var lat = parseFloat(req.query.lat);
+  console.log("lng: " + lng + ", lat: " + lat);
+
   var point = {
     type: "Point",
     coordinates: [lng, lat]
@@ -34,8 +38,8 @@ module.exports.locationsListByDistance = function(req, res) {
 
   var geoOptions = {
     spherical: true,
-    maxDistance: theEarth.getRadsFromDistance(req.query.max_distance),
-    num: 10
+    maxDistance: theEarth.getRadsFromDistance(parseFloat(req.query.max_distance)),
+    num: 10  // max 10 objects returned
   };
 
   if (!lng || !lat) {
