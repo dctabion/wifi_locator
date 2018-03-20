@@ -8,6 +8,15 @@ if (process.env.NODE_ENV === 'production') {
 
 var renderHomepage = function(req, res, responseBody) {
   console.log('---renderHomepage()');
+  var message;
+  if (!(responseBody instanceof Array)) {
+    console.log('responseBody not instance of array: ', responseBody);
+    message = "API lookup error (responseBody not instance of array)";
+    responseBody = [];
+  }
+  else if (!responseBody.length) {
+    message = "No places found nearby";
+  }
   res.render('locations-list', {
     title: 'Loc8r - find a place to work with WIFI',
     pageHeader: {
@@ -15,7 +24,8 @@ var renderHomepage = function(req, res, responseBody) {
       strapline: 'Find places to work with wifi near you!'
     },
     sidebar: 'Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you\'re looking for.',
-    locations: responseBody
+    locations: responseBody,
+    message: message
    });
 }
 
@@ -32,6 +42,12 @@ module.exports.homelist = function (req, res) {
       lng: -87.7035451,
       lat: 41.9225028,
       maxDistance: 10721
+      // lng: 50,
+      // lat: 100,
+      // maxDistance: 1
+      // lng: 0,
+      // lat: 0,
+      // maxDistance: 1
       // 0 Starcups, 79.57072 Jow Blow's, 10720.126 Jim Crow
     }
   };

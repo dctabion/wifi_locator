@@ -52,7 +52,7 @@ module.exports.locationsListByDistance = function(req, res) {
     num: 10  // max 10 objects returned
   };
 
-  if (!lng || !lat) {
+  if ((!lng && lng!=0)|| (!lat && lat!=0)) {
     sendJsonResponse(res, 404, {
       "message": "lng and lat query parameters are required"
     });
