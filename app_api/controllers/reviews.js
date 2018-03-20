@@ -160,7 +160,7 @@ module.exports.reviewsUpdateOne = function(req, res) {
   }
   Loc
     .findById(req.params.locationid)
-    .select('reviews')
+    .select('-reviews -ratings')
     .exec(
       function(err, location) {
         var thisReview;

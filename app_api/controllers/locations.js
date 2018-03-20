@@ -15,6 +15,8 @@ var theEarth = (function() {
   };
 
   var getRadsFromDistance = function(distance) {
+    console.log('---getRadsFromDistance(', distance, ')');
+    console.log('in radians: ', parseFloat(distance / earthRadius));
     return parseFloat(distance / earthRadius);
   };
 
@@ -25,10 +27,18 @@ var theEarth = (function() {
 }) ();
 
 module.exports.locationsListByDistance = function(req, res) {
+  console.log('---locationsListByDistance()');
   console.log("req.query: ", req.query);
 
-  var lng = parseFloat(req.query.lng);
-  var lat = parseFloat(req.query.lat);
+  // Original code
+  // var lng = parseFloat(req.query.lng);
+  // var lat = parseFloat(req.query.lat);
+
+  // **** I Flipped these...i think mongoose changed...??
+  var lng = parseFloat(req.query.lat);
+  var lat = parseFloat(req.query.lng);
+
+
   console.log("lng: " + lng + ", lat: " + lat);
 
   var point = {
@@ -38,7 +48,7 @@ module.exports.locationsListByDistance = function(req, res) {
 
   var geoOptions = {
     spherical: true,
-    maxDistance: theEarth.getRadsFromDistance(parseFloat(req.query.max_distance)),
+    maxDistance: theEarth.getRadsFromDistance(parseFloat(req.query.maxDistance)),
     num: 10  // max 10 objects returned
   };
 
@@ -50,6 +60,7 @@ module.exports.locationsListByDistance = function(req, res) {
   }
 
   Loc.geoNear(point, geoOptions, function(err, results, stats) {
+    console.log("geoOptions:", geoOptions);
     var locations = [];
     if (err) {
       sendJsonResponse(res, 404, err);
@@ -120,7 +131,7 @@ module.exports.locationsReadOne = function(req, res) {
     });
   }
   else {
-    console.log("No locationid in request");
+    console.log("No locationid in");
     sendJsonResponse(res, 404, { messages: "No locationid in request"});
   }
 };

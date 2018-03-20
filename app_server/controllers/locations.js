@@ -1,5 +1,13 @@
-/* GET 'home' page */
-module.exports.homelist = function (req, res) {
+var request = require('request');
+var apiOptions = {
+  server: "http://localhost:3000"
+};
+if (process.env.NODE_ENV === 'production') {
+  apiOptions.server = "https://sheltered-peak-20716.herokuapp.com/";
+}
+
+var renderHomepage = function(req, res, responseBody) {
+  console.log('---renderHomepage()');
   res.render('locations-list', {
     title: 'Loc8r - find a place to work with WIFI',
     pageHeader: {
@@ -7,26 +15,57 @@ module.exports.homelist = function (req, res) {
       strapline: 'Find places to work with wifi near you!'
     },
     sidebar: 'Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you\'re looking for.',
-    locations: [{
-      name: 'Starcups',
-      address: '125 High Street, Reading, RG6 1PS',
-      rating: 5,
-      facilities: ['Hot drinks', 'Food', 'Premium wifi'],
-      distance: '100m'
-    }, {
-      name: 'Dood\'s Place',
-      address: '125 Low Street, Reading, RG6 1PS',
-      rating: 1,
-      facilities: ['Hot soup', 'Slop', 'Premium wifi'],
-      distance: '50m'
-     }, {
-       name: 'Fred\'s Tavern',
-       address: '123 sesame street, Reading, RG6 1PS',
-       rating: 3,
-       facilities: ['Green food', 'Bad service', 'Premium wifi'],
-       distance: '10000m'
-     }]
+    locations: responseBody
    });
+}
+
+/* GET 'home' page */
+module.exports.homelist = function (req, res) {
+  console.log('---homelist()');
+  var requestOptions, path;
+  path = '/api/locations';
+  requestOptions = {
+    url: apiOptions.server + path,
+    method: "GET",
+    json: {},
+    qs: {
+      lng: -87.7035451,
+      lat: 41.9225028,
+      maxDistance: 10721
+      // 0 Starcups, 79.57072 Jow Blow's, 10720.126 Jim Crow
+    }
+  };
+  console.log('requestOptions')
+  request(
+    requestOptions,
+    function(err, response, body) {
+      console.log('---RESPONSE---');
+      console.log('err', err);
+      // console.log('response: ', response);
+      console.log('body', body);
+
+      var i, data;
+      data = body;
+      if (response.statusCode === 200 && data.length) {
+        for (i=0; i<data.length; i++) {
+          data[i].distance = _formatDistance(data[i].distance);
+        }
+      }
+      renderHomepage(req, res, data);  // --- maybe don't need this helper
+  });
+};
+
+var _formatDistance = function(distance) {
+  var numDistance, unit;
+  if (distance > 1) {
+    numDistance = parseFloat(distance).toFixed(1);
+    unit = 'km';
+  }
+  else {
+    numDistance = parseInt(distance * 1000,10);
+    unit = 'm';
+  }
+  return numDistance + unit;
 };
 
 /* GET 'Location info' page */
@@ -81,5 +120,6 @@ module.exports.locationInfo = function (req, res) {
 
 /* GET 'Add review' page */
 module.exports.addReview = function (req, res) {
+  console.log('---addReview()');
   res.render('location-review-form', { title: 'Add review'});
 };

@@ -3,7 +3,7 @@
   address: '125 High Street, Reading, RG6 1PS',
   rating: 3,
   facilities: ['Hot drinks', 'Food', 'Premium WIFI'],
-  coords: {lat: 51.455041, lng: -0.9690884},
+  coords: {lat: 41.9225028, lng: -87.7035451},
   openingTimes: [{
     days: 'Monday - Friday',
     opening: '7:00am',
@@ -52,7 +52,7 @@
   address: '1511 Sesame Street',
   rating: 5,
   facilities: ['Great beer', 'Hot links', 'Premium WIFI'],
-  coords: {lat: 40, lng: -0.9690884},
+  coords: {lat: 41.9225000, lng: -87.7035451},
   openingTimes: [{
     days: 'Mon - Wed',
     opening: '3:00am',
@@ -91,7 +91,7 @@
   address: '1919 KKK Drive',
   rating: 1,
   facilities: ['Lynch Ropes', 'Bathtub Gin', 'Premium WIFI'],
-  coords: {lat: 40, lng: -11},
+  coords: {lat: 41.9225199, lng: -87.7035300},
   openingTimes: [{
     days: 'Mon',
     opening: '12am',
