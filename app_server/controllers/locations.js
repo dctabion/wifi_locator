@@ -56,6 +56,35 @@ var _showError = function (req, res, status) {
   });
 };
 
+var getLocationInfo = function (req, res, callback) {
+  var requestOptions, path;
+  console.log('getLocationInfo()------');
+  console.log('req.params: ', req.params);
+  path = "/api/locations/" + req.params.locationid;
+  requestOptions = {
+    url: apiOptions.server + path,
+    method: "GET",
+    json: {}
+  };
+  request(
+    requestOptions,
+    function(err, response, body) {
+      console.log('body: ', body);
+      var data = body;
+      if (response.statusCode === 200) {
+        data.coords = {
+          lng: body.coords[0],
+          lat: body.coords[1]
+        };
+        console.log("data-----", data);
+        callback(req, res, data);  // take appropriate action
+      } else {
+        _showError(req, res, response.statusCode);
+      }
+    }
+  );
+};
+
 var renderHomepage = function(req, res, responseBody) {
   console.log('---renderHomepage()');
   var message;
@@ -77,6 +106,25 @@ var renderHomepage = function(req, res, responseBody) {
     locations: responseBody,
     message: message
    });
+}
+
+function renderDetailPage(req, res, locDetail) {
+  res.render('location-info', {
+    title: locDetail.name,
+    pageHeader: {title: locDetail.name},
+    sidebar: {
+      context: 'is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.',
+      callToAction: 'If you\'ve been ad you like it - or if you don\'t - please leave a review to help other people just like you.'
+    },
+    location: locDetail
+  });
+};
+
+function renderReviewForm(req, res, locDetail) {
+  res.render('location-review-form', {
+    title: 'Review ' + locDetail.name + ' on Loc8r',
+    pageHeader: { title: 'Review ' + locDetail.name }
+  });
 }
 
 /* GET 'home' page */
@@ -125,49 +173,48 @@ module.exports.homelist = function (req, res) {
 };
 
 
-function renderDetailPage(req, res, locDetail) {
-  res.render('location-info', {
-    title: locDetail.name,
-    pageHeader: {title: locDetail.name},
-    sidebar: {
-      context: 'is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.',
-      callToAction: 'If you\'ve been ad you like it - or if you don\'t - please leave a review to help other people just like you.'
-    },
-    location: locDetail
-  });
-};
+
 
 /* GET 'Location info' page */
 module.exports.locationInfo = function (req, res) {
-  var requestOptions, path;
-  path = "/api/locations/" + req.params.locationid;
-  requestOptions = {
-    url: apiOptions.server + path,
-    method: "GET",
-    json: {}
-  };
-  request(
-    requestOptions,
-    function(err, response, body) {
-      console.log('body: ', body);
-      var data = body;
-      if (response.statusCode === 200) {
-        data.coords = {
-          lng: body.coords[0],
-          lat: body.coords[1]
-        };
-        console.log("data-----", data);
-        renderDetailPage(req, res, data);
-      } else {
-        _showError(req, res, response.statusCode);
-      }
-    }
-  );
+  getLocationInfo(req, res, function (req, res, responseData) {
+    renderDetailPage(req, res, responseData);
+  });
 };
 
 
 /* GET 'Add review' page */
 module.exports.addReview = function (req, res) {
   console.log('---addReview()');
-  res.render('location-review-form', { title: 'Add review'});
+  getLocationInfo(req, res, function(req, res, responseData) {
+    renderReviewForm(req, res, responseData);
+  });
+};
+
+/* POST 'Add review' page */
+module.exports.doAddReview = function (req, res) {
+  console.log('---doAddReview()');
+  var requestOptions, path, locationid, postData;
+  locationid = req.params.locationid;
+  path = "/api/locations/" + locationid + "/reviews"
+  postData = {
+    author: req.body.name,
+    rating: parseInt(req.body.rating, 10),
+    reviewText: req.body.review
+  };
+  requestOptions = {
+    url: apiOptions.server + path,
+    method: "POST",
+    json: postData
+  };
+  request(
+    requestOptions,
+    function(err, response, body) {
+      if (response.statusCode === 201) {
+        res.redirect('/location/' + locationid);
+      } else {
+        _showError(req, res, response.statusCode);
+      }
+    }
+  );
 };

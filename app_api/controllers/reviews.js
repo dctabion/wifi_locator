@@ -53,7 +53,7 @@ var doSetAverageRating = function(location) {
     for (i = 0; i < reviewCount; i++) {
       ratingTotal = ratingTotal + location.reviews[i].rating;
     }
-    ratingAverage = parseInt(ratingTotal / reviewcount, 10);
+    ratingAverage = parseInt(ratingTotal / reviewCount, 10);
     location.rating = ratingAverage;
     location.save(function(err) {
       if (err) {
@@ -70,6 +70,7 @@ var doSetAverageRating = function(location) {
 
 module.exports.reviewsCreate = function(req, res) {
   var locationid = req.params.locationid;
+  console.log('reviewsCreate()-----locationid: ', locationid);
   if (locationid) {
     Loc
       .findById(locationid)
