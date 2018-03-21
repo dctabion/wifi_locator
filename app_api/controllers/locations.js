@@ -60,13 +60,17 @@ module.exports.locationsListByDistance = function(req, res) {
   }
 
   Loc.geoNear(point, geoOptions, function(err, results, stats) {
+    console.log("inside geoNear()-------");
     console.log("geoOptions:", geoOptions);
+    console.log("results: ", results);
+
     var locations = [];
     if (err) {
       sendJsonResponse(res, 404, err);
     }
     else {
       results.forEach(function(doc) {
+        console.log('----' + doc.obj.name + ": " + doc.dis)
         locations.push({
           distance: theEarth.getDistanceFromRads(doc.dis),
           name: doc.obj.name,

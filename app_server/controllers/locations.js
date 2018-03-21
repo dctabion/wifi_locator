@@ -6,6 +6,56 @@ if (process.env.NODE_ENV === 'production') {
   apiOptions.server = "https://sheltered-peak-20716.herokuapp.com/";
 }
 
+var _formatDistance = function(distance) {
+  var numDistance, unit;
+  if (distance > 1) {
+    numDistance = parseFloat(distance).toFixed(1);
+    unit = 'km';
+  }
+  else {
+    numDistance = parseInt(distance * 1000,10);
+    unit = 'm';
+  }
+  return numDistance + unit;
+};
+
+// var _isNumeric = function (n) {
+//   return !isNaN(parseFloat(n)) && isFinite(n);
+// };
+//
+// var _formatDistance = function (distance) {
+//   var numDistance, unit;
+//   if (distance && _isNumeric(distance)) {
+//     if (distance > 1) {
+//       numDistance = parseFloat(distance).toFixed(1);
+//       unit = 'km';
+//     } else {
+//       numDistance = parseInt(distance * 1000,10);
+//       unit = 'm';
+//     }
+//     return numDistance + unit;
+//   } else {
+//     return "?";
+//   }
+// };
+
+var _showError = function (req, res, status) {
+  var title, content;
+  if (status === 404) {
+    title = "404, page not found";
+    content = "Oh, dear. Looks like we can't find the page. Sorry.";
+  }
+  else {
+    title = status + ", something's gone wrong.";
+    content = "Something, somewhere has gone a little bit off";
+  }
+  res.status(status);
+  res.render('generic-text', {
+    title: title,
+    content: content
+  });
+};
+
 var renderHomepage = function(req, res, responseBody) {
   console.log('---renderHomepage()');
   var message;
@@ -39,9 +89,12 @@ module.exports.homelist = function (req, res) {
     method: "GET",
     json: {},
     qs: {
-      lng: -87.7035451,
+      // lng: -87.7035451,
+      // lat: 41.9225028,
+      // maxDistance: 10799
       lat: 41.9225028,
-      maxDistance: 10721
+      lng: -87.7035451,
+      maxDistance: 10799
       // lng: 50,
       // lat: 100,
       // maxDistance: 1
@@ -71,66 +124,45 @@ module.exports.homelist = function (req, res) {
   });
 };
 
-var _formatDistance = function(distance) {
-  var numDistance, unit;
-  if (distance > 1) {
-    numDistance = parseFloat(distance).toFixed(1);
-    unit = 'km';
-  }
-  else {
-    numDistance = parseInt(distance * 1000,10);
-    unit = 'm';
-  }
-  return numDistance + unit;
-};
 
-/* GET 'Location info' page */
-module.exports.locationInfo = function (req, res) {
+function renderDetailPage(req, res, locDetail) {
   res.render('location-info', {
-    title: 'Location Info',
-    pageHeader: {title: 'Starcups'},
+    title: locDetail.name,
+    pageHeader: {title: locDetail.name},
     sidebar: {
       context: 'is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.',
       callToAction: 'If you\'ve been ad you like it - or if you don\'t - please leave a review to help other people just like you.'
     },
-    location: {
-      name: 'Starcups',
-      address: '125 High Street, Reading, RG6 1PS',
-      rating: 3,
-      facilities: ['Hot drinks', 'Food', 'Premium WIFI'],
-      coords: {lat: 51.455041, lng: -0.9690884},
-      openingTimes: [{
-        days: 'Monday - Friday',
-        opening: '7:00am',
-        closing: '7:00pm',
-        closed: false
-      },{
-        days: 'Saturday',
-        opening: '8:00am',
-        closing: '5:00pm',
-        closed: false
-      },{
-        days: 'Sunday',
-        closed: true
-      }],
-      reviews: [{
-        author: 'Simon Holmes',
-        rating: 5,
-        timestamp: '16 July 2013',
-        reviewText: 'What a great place.  I can\'t say enough good things about it.'
-      }, {
-        author: 'Dood McGee',
-        rating: 5,
-        timestamp: '17 July 2013',
-        reviewText: 'A class a dump.  I cannot stand it.  loud. obnoxious.  But i\'ll give 5 stars.'
-      }, {
-        author: 'Fred McGriff',
-        rating: 5,
-        timestamp: '1 July 2013',
-        reviewText: 'Well, what can i say?  Dood McGee goes here.  Everyone wants to be like Dood.'
-      }]
-    }
+    location: locDetail
   });
+};
+
+/* GET 'Location info' page */
+module.exports.locationInfo = function (req, res) {
+  var requestOptions, path;
+  path = "/api/locations/" + req.params.locationid;
+  requestOptions = {
+    url: apiOptions.server + path,
+    method: "GET",
+    json: {}
+  };
+  request(
+    requestOptions,
+    function(err, response, body) {
+      console.log('body: ', body);
+      var data = body;
+      if (response.statusCode === 200) {
+        data.coords = {
+          lng: body.coords[0],
+          lat: body.coords[1]
+        };
+        console.log("data-----", data);
+        renderDetailPage(req, res, data);
+      } else {
+        _showError(req, res, response.statusCode);
+      }
+    }
+  );
 };
 
 

@@ -1,4 +1,5 @@
 extends layout
+
 block content
   #banner.page-header
     .row
@@ -6,7 +7,5 @@ block content
         h1= title
   .row
     .col-md-6.col-sm-12
-      p
-        | Loc8r was created to help people find places to sit down and get a bit of work done.
-        | <br /><br />
-        | asd;lfkjasl;dfjkal;sjkdf;lajksdfl;ajksdf;lajksdl;fjkal;sdfj;lajsdf.asdflajksdfa. asdfasdf. Check me out yo.
+      p !{(content).replace(/\n/g, '<br/>')}
+      p by the way...Loc8r was created to help people find places to sit down and get a bit of work done.
