@@ -123,7 +123,8 @@ function renderDetailPage(req, res, locDetail) {
 function renderReviewForm(req, res, locDetail) {
   res.render('location-review-form', {
     title: 'Review ' + locDetail.name + ' on Loc8r',
-    pageHeader: { title: 'Review ' + locDetail.name }
+    pageHeader: { title: 'Review ' + locDetail.name },
+    error: req.query.err
   });
 }
 
@@ -207,14 +208,24 @@ module.exports.doAddReview = function (req, res) {
     method: "POST",
     json: postData
   };
-  request(
-    requestOptions,
-    function(err, response, body) {
-      if (response.statusCode === 201) {
-        res.redirect('/location/' + locationid);
-      } else {
-        _showError(req, res, response.statusCode);
+  // if (postData.author == "dood") { // this will allow the api to catch validation error except for 'dood'
+  if (!postData.author || !postData.rating || !postData.reviewText) {
+    console.log('---caught review validation error in app controller doAddReview().  missing field');
+    console.log('requestOptions:', requestOptions);
+    res.redirect('/location/' + locationid + '/reviews/new?err=val');
+  } else {
+    request(
+      requestOptions,
+      function(err, response, body) {
+        if (response.statusCode === 201) {
+          res.redirect('/location/' + locationid);
+        } else if (response.statusCode === 400 && body.name && body.name === "ValidationError" ) {
+          console.log('----caught review validation error.  API caught it and gave app controller doAddReview() a 400');
+          res.redirect('/location/' + locationid + '/reviews/new?err=val');
+        } else {
+          _showError(req, res, response.statusCode);
+        }
       }
-    }
-  );
+    );
+  }
 };
