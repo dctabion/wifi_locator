@@ -85,26 +85,16 @@ var getLocationInfo = function (req, res, callback) {
   );
 };
 
-var renderHomepage = function(req, res, responseBody) {
+var renderHomepage = function(req, res) {
   console.log('---renderHomepage()');
-  var message;
-  if (!(responseBody instanceof Array)) {
-    console.log('responseBody not instance of array: ', responseBody);
-    message = "API lookup error (responseBody not instance of array)";
-    responseBody = [];
-  }
-  else if (!responseBody.length) {
-    message = "No places found nearby";
-  }
+
   res.render('locations-list', {
     title: 'Loc8r - find a place to work with WIFI',
     pageHeader: {
       title: 'Loc8r',
       strapline: 'Find places to work with wifi near you!'
     },
-    sidebar: 'Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you\'re looking for.',
-    locations: responseBody,
-    message: message
+    sidebar: 'Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you\'re looking for.'
    });
 }
 
@@ -131,46 +121,7 @@ function renderReviewForm(req, res, locDetail) {
 /* GET 'home' page */
 module.exports.homelist = function (req, res) {
   console.log('---homelist()');
-  var requestOptions, path;
-  path = '/api/locations';
-  requestOptions = {
-    url: apiOptions.server + path,
-    method: "GET",
-    json: {},
-    qs: {
-      // lng: -87.7035451,
-      // lat: 41.9225028,
-      // maxDistance: 10799
-      lat: 41.9225028,
-      lng: -87.7035451,
-      maxDistance: 10799
-      // lng: 50,
-      // lat: 100,
-      // maxDistance: 1
-      // lng: 0,
-      // lat: 0,
-      // maxDistance: 1
-      // 0 Starcups, 79.57072 Jow Blow's, 10720.126 Jim Crow
-    }
-  };
-  console.log('requestOptions')
-  request(
-    requestOptions,
-    function(err, response, body) {
-      console.log('---RESPONSE---');
-      console.log('err', err);
-      // console.log('response: ', response);
-      console.log('body', body);
-
-      var i, data;
-      data = body;
-      if (response.statusCode === 200 && data.length) {
-        for (i=0; i<data.length; i++) {
-          data[i].distance = _formatDistance(data[i].distance);
-        }
-      }
-      renderHomepage(req, res, data);  // --- maybe don't need this helper
-  });
+  renderHomepage(req, res);  // --- maybe don't need this helper
 };
 
 
